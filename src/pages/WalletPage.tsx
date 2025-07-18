@@ -3,8 +3,7 @@ import { Plus, Gift, ArrowRightLeft } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import Button from '../components/Button';
-import TransactionItem from '../components/TransactionItem';
-import { transactions } from '../data/mockData';
+import { ArrowUpRight, ArrowDownLeft } from 'lucide-react';
 
 const WalletPage: React.FC = () => {
   const { t, isRTL } = useLanguage();
@@ -13,6 +12,66 @@ const WalletPage: React.FC = () => {
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
   const [amount, setAmount] = useState(1);
   const [email, setEmail] = useState('');
+
+  // Mock transactions data
+  const transactions = [
+    {
+      id: '1',
+      type: 'debit' as const,
+      amount: 2,
+      description: 'Graphic Design Service',
+      date: new Date('2023-06-10T14:30:00')
+    },
+    {
+      id: '2',
+      type: 'credit' as const,
+      amount: 3,
+      description: 'Cooking Class',
+      date: new Date('2023-06-08T10:15:00')
+    },
+    {
+      id: '3',
+      type: 'debit' as const,
+      amount: 1,
+      description: 'English Tutoring Session',
+      date: new Date('2023-06-05T16:45:00')
+    }
+  ];
+
+  const formatDate = (date: Date) => {
+    return new Date(date).toLocaleDateString(undefined, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+  };
+
+  const TransactionItem = ({ transaction }: { transaction: typeof transactions[0] }) => {
+    const isCredit = transaction.type === 'credit';
+    
+    return (
+      <div className={`py-4 border-b border-gray-100 last:border-0 ${isRTL ? 'text-right' : 'text-left'}`}>
+        <div className={`flex items-center ${isRTL ? 'flex-row-reverse' : 'flex-row'}`}>
+          <div className={`w-10 h-10 rounded-full flex items-center justify-center ${isCredit ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
+            {isCredit ? <ArrowDownLeft size={20} /> : <ArrowUpRight size={20} />}
+          </div>
+          
+          <div className={`${isRTL ? 'mr-3' : 'ml-3'} flex-1`}>
+            <h4 className="font-medium text-gray-800">
+              {transaction.description}
+            </h4>
+            <p className="text-sm text-gray-500">
+              {formatDate(transaction.date)}
+            </p>
+          </div>
+          
+          <div className={`font-semibold ${isCredit ? 'text-green-600' : 'text-red-600'}`}>
+            {isCredit ? '+' : '-'}{transaction.amount} {transaction.amount === 1 ? 'Hour' : 'Hours'}
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="container mx-auto px-4 py-12">

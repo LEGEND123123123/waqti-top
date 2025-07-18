@@ -3,7 +3,6 @@ import { Edit, Star, MapPin, Calendar, Award, MessageSquare, Shield } from 'luci
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import Button from '../components/Button';
-import { services } from '../data/mockData';
 
 interface UserProfilePageProps {
   setActivePage: (page: string) => void;
@@ -15,6 +14,30 @@ const UserProfilePage: React.FC<UserProfilePageProps> = ({ setActivePage, userId
   const { isRTL } = useLanguage();
   const [activeTab, setActiveTab] = useState('overview');
   const [isEditing, setIsEditing] = useState(false);
+
+  // Mock services data
+  const services = [
+    {
+      id: '1',
+      title: 'Professional Web Development',
+      description: 'Expert web development services',
+      category: 'Programming',
+      provider: {
+        id: '101',
+        name: 'Ahmed Hassan',
+        email: 'ahmed@example.com',
+        phone: '+971501234567',
+        balance: 8,
+        joinedAt: new Date('2023-01-15'),
+        avatar: 'https://randomuser.me/api/portraits/men/32.jpg'
+      },
+      hourlyRate: 2,
+      location: 'Dubai',
+      rating: 4.8,
+      reviews: 24,
+      image: 'https://images.pexels.com/photos/3861958/pexels-photo-3861958.jpeg'
+    }
+  ];
 
   // Mock user data - in real app, fetch based on userId
   const profileUser = userId ? {

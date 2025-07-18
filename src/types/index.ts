@@ -68,20 +68,42 @@ export interface ExpertiseVerification {
   yearsOfExperience: number;
 }
 
-// إعادة تصدير أنواع المشاريع
-export * from './projects';
+// Additional types for the platform
+export interface Project {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  client: User;
+  budget: {
+    type: 'time' | 'money';
+    amount: number;
+    currency?: 'AED' | 'USD' | 'EUR';
+  };
+  skills: string[];
+  deadline?: Date;
+  status: 'open' | 'in_progress' | 'completed' | 'cancelled';
+  location?: string;
+  isRemote: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  proposals: Proposal[];
+  urgency: 'low' | 'medium' | 'high';
+  attachments?: string[];
+}
 
-// إعادة تصدير أنواع المستقلين
-export * from './freelancer';
-
-// إعادة تصدير أنواع الدفع والوساطة
-export * from './payment';
-
-// إعادة تصدير أنواع الرسائل
-export * from './messaging';
-
-// إعادة تصدير أنواع البحث والتصفية
-export * from './search';
-
-// إعادة تصدير أنواع الدعم والأسئلة الشائعة
-export * from './support';
+export interface Proposal {
+  id: string;
+  projectId: string;
+  freelancer: User;
+  coverLetter: string;
+  proposedBudget: {
+    type: 'time' | 'money';
+    amount: number;
+    currency?: 'AED' | 'USD' | 'EUR';
+  };
+  deliveryTime: number;
+  status: 'pending' | 'accepted' | 'rejected' | 'withdrawn';
+  createdAt: Date;
+  updatedAt: Date;
+}

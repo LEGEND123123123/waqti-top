@@ -4,7 +4,6 @@ import { Service } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 import ServiceCard from '../components/ServiceCard';
 import Button from '../components/Button';
-import { services } from '../data/mockData';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 
@@ -20,6 +19,70 @@ const HomePage: React.FC<HomePageProps> = ({ setActivePage, onServiceClick }) =>
   const [servicesRef, servicesInView] = useInView({ triggerOnce: true });
   const [howItWorksRef, howItWorksInView] = useInView({ triggerOnce: true });
   
+  // Mock services data
+  const services = [
+    {
+      id: '1',
+      title: 'Professional Web Development',
+      description: 'I offer expert web development services using modern technologies like React, Vue, and Node.js.',
+      category: 'Programming',
+      provider: {
+        id: '101',
+        name: 'Ahmed Hassan',
+        email: 'ahmed@example.com',
+        phone: '+971501234567',
+        balance: 8,
+        joinedAt: new Date('2023-01-15'),
+        avatar: 'https://randomuser.me/api/portraits/men/32.jpg'
+      },
+      hourlyRate: 2,
+      location: 'Dubai',
+      rating: 4.8,
+      reviews: 24,
+      image: 'https://images.pexels.com/photos/3861958/pexels-photo-3861958.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'
+    },
+    {
+      id: '2',
+      title: 'Arabic-English Translation',
+      description: 'Native Arabic speaker offering professional translation services.',
+      category: 'Translation',
+      provider: {
+        id: '102',
+        name: 'Layla Mohamed',
+        email: 'layla@example.com',
+        phone: '+971502345678',
+        balance: 12,
+        joinedAt: new Date('2023-02-20'),
+        avatar: 'https://randomuser.me/api/portraits/women/44.jpg'
+      },
+      hourlyRate: 1,
+      location: 'Abu Dhabi',
+      rating: 4.9,
+      reviews: 36,
+      image: 'https://images.pexels.com/photos/7092613/pexels-photo-7092613.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'
+    },
+    {
+      id: '3',
+      title: 'Graphic Design & Branding',
+      description: 'Creative graphic designer specializing in branding, logo design, and marketing materials.',
+      category: 'Design',
+      provider: {
+        id: '103',
+        name: 'Sara Ali',
+        email: 'sara@example.com',
+        phone: '+971503456789',
+        balance: 9,
+        joinedAt: new Date('2023-03-10'),
+        avatar: 'https://randomuser.me/api/portraits/women/63.jpg'
+      },
+      hourlyRate: 2,
+      location: 'Sharjah',
+      rating: 4.7,
+      reviews: 19,
+      image: 'https://images.pexels.com/photos/6444/pencil-typography-black-design.jpg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'
+    }
+  ];
+
   // Get popular services (top 6 by rating)
   const popularServices = [...services]
     .sort((a, b) => b.rating - a.rating)

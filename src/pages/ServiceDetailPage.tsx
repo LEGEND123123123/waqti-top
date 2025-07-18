@@ -4,7 +4,6 @@ import { Service } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import Button from '../components/Button';
-import { services } from '../data/mockData';
 
 interface ServiceDetailPageProps {
   serviceId: string;
@@ -20,6 +19,50 @@ const ServiceDetailPage: React.FC<ServiceDetailPageProps> = ({ serviceId, setAct
   const [time, setTime] = useState('');
   const [duration, setDuration] = useState(1);
   
+  // Mock services data
+  const services = [
+    {
+      id: '1',
+      title: 'Professional Web Development',
+      description: 'I offer expert web development services using modern technologies like React, Vue, and Node.js. Whether you need a new website, help with an existing project, or advice on best practices, I can help you bring your ideas to life with clean, efficient code.',
+      category: 'Programming',
+      provider: {
+        id: '101',
+        name: 'Ahmed Hassan',
+        email: 'ahmed@example.com',
+        phone: '+971501234567',
+        balance: 8,
+        joinedAt: new Date('2023-01-15'),
+        avatar: 'https://randomuser.me/api/portraits/men/32.jpg'
+      },
+      hourlyRate: 2,
+      location: 'Dubai',
+      rating: 4.8,
+      reviews: 24,
+      image: 'https://images.pexels.com/photos/3861958/pexels-photo-3861958.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'
+    },
+    {
+      id: '2',
+      title: 'Arabic-English Translation',
+      description: 'Native Arabic speaker offering professional translation services. I can translate documents, websites, books, and more with accuracy and attention to cultural nuances.',
+      category: 'Translation',
+      provider: {
+        id: '102',
+        name: 'Layla Mohamed',
+        email: 'layla@example.com',
+        phone: '+971502345678',
+        balance: 12,
+        joinedAt: new Date('2023-02-20'),
+        avatar: 'https://randomuser.me/api/portraits/women/44.jpg'
+      },
+      hourlyRate: 1,
+      location: 'Abu Dhabi',
+      rating: 4.9,
+      reviews: 36,
+      image: 'https://images.pexels.com/photos/7092613/pexels-photo-7092613.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'
+    }
+  ];
+
   // Find the selected service
   const service = services.find((s) => s.id === serviceId);
   
