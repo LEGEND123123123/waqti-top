@@ -11,6 +11,11 @@ import ContractsPaymentsPage from './pages/ContractsPaymentsPage';
 import WalletPage from './pages/WalletPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import RoleSelectionPage from './pages/RoleSelectionPage';
+import EnhancedLoginPage from './pages/EnhancedLoginPage';
+import EnhancedRegisterPage from './pages/EnhancedRegisterPage';
+import EmailVerificationPage from './pages/EmailVerificationPage';
+import FreelancerVerificationPage from './pages/FreelancerVerificationPage';
 import ProviderRegistrationPage from './pages/ProviderRegistrationPage';
 import PhoneVerificationPage from './pages/PhoneVerificationPage';
 import ExpertiseVerificationPage from './pages/ExpertiseVerificationPage';
@@ -31,13 +36,28 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 
 function AppContent() {
   const [activePage, setActivePage] = useState('home');
+  const [selectedRole, setSelectedRole] = useState<'freelancer' | 'client' | null>(null);
+  const [pendingVerificationEmail, setPendingVerificationEmail] = useState('');
   const [selectedServiceId, setSelectedServiceId] = useState<string | null>(null);
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
   const [selectedFreelancerId, setSelectedFreelancerId] = useState<string | null>(null);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [previousPage, setPreviousPage] = useState('services');
   const [verificationPhone, setVerificationPhone] = useState('');
-  const { isLoading } = useAuth();
+  const { isLoading, userRole } = useAuth();
+
+  const handleRoleSelect = (role: 'freelancer' | 'client') => {
+    setSelectedRole(role);
+    setActivePage('enhanced-register');
+  };
+
+  const handleEmailVerificationComplete = () => {
+    if (selectedRole === 'freelancer') {
+      setActivePage('freelancer-verification');
+    } else {
+      setActivePage('dashboard');
+    }
+  };
 
   const handleServiceClick = (serviceId: string) => {
     setPreviousPage(activePage);
@@ -84,6 +104,30 @@ function AppContent() {
     switch (activePage) {
       case 'home':
         return <HomePage setActivePage={setActivePage} onServiceClick={handleServiceClick} />;
+      case 'role-selection':
+        return <RoleSelectionPage onRoleSelect={handleRoleSelect} setActivePage={setActivePage} />;
+      case 'enhanced-login':
+        return selectedRole ? (
+          <EnhancedLoginPage setActivePage={setActivePage} userRole={selectedRole} />
+        ) : (
+          <RoleSelectionPage onRoleSelect={handleRoleSelect} setActivePage={setActivePage} />
+        );
+      case 'enhanced-register':
+        return selectedRole ? (
+          <EnhancedRegisterPage setActivePage={setActivePage} userRole={selectedRole} />
+        ) : (
+          <RoleSelectionPage onRoleSelect={handleRoleSelect} setActivePage={setActivePage} />
+        );
+      case 'email-verification':
+        return (
+          <EmailVerificationPage
+            email={pendingVerificationEmail}
+            onVerificationComplete={handleEmailVerificationComplete}
+            setActivePage={setActivePage}
+          />
+        );
+      case 'freelancer-verification':
+        return <FreelancerVerificationPage setActivePage={setActivePage} />;
       case 'services':
         return <ServicesPage onServiceClick={handleServiceClick} />;
       case 'projects':

@@ -9,6 +9,8 @@ export interface User {
   expertiseLevel?: 'beginner' | 'professional' | 'expert';
   isVerified?: boolean;
   identityVerified?: boolean;
+  role?: 'freelancer' | 'client' | 'admin';
+  verificationStatus?: 'pending' | 'in_progress' | 'completed' | 'rejected';
 }
 
 export interface Service {

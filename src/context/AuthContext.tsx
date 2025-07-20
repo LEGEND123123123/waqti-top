@@ -2,15 +2,18 @@ import React, { createContext, useContext, useState, ReactNode, useEffect } from
 import { User } from '../types';
 import { supabase } from '../lib/supabase';
 import type { User as SupabaseUser } from '@supabase/supabase-js';
+import { UserRole } from '../types/verification';
 
 interface AuthContextType {
   user: User | null;
+  userRole: UserRole | null;
   isLoggedIn: boolean;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
-  register: (name: string, email: string, password: string, phone: string) => Promise<{ success: boolean; error?: string }>;
+  login: (email: string, password: string) => Promise<{ success: boolean; error?: string; role?: UserRole }>;
+  register: (name: string, email: string, password: string, phone: string, role: 'freelancer' | 'client') => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
   updateProfile: (updates: Partial<User>) => Promise<{ success: boolean; error?: string }>;
+  setUserRole: (role: UserRole) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -21,6 +24,7 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [userRole, setUserRoleState] = useState<UserRole | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const isLoggedIn = user !== null;
 
@@ -84,8 +88,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           email: data.email || '',
           phone: data.phone || '',
           balance: data.balance || 2,
-          joinedAt: new Date(data.created_at),
+            avatar: data.avatar_url,
+            role: data.role || 'client',
+            verificationStatus: data.verification_status || 'pending'
           avatar: data.avatar_url
+          
+          // Set user role based on database data
+          const role: UserRole = {
+            type: data.role || 'client',
+            permissions: data.role === 'freelancer' ? ['create_services', 'submit_proposals'] : ['create_projects', 'hire_freelancers'],
+            verificationRequired: data.role === 'freelancer',
+            verificationStatus: data.verification_status || 'pending'
+          };
+          setUserRoleState(role);
         });
       }
     } catch (error) {
@@ -131,7 +146,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     name: string,
     email: string,
     password: string,
-    phone: string
+    phone: string,
+    role: 'freelancer' | 'client'
   ): Promise<{ success: boolean; error?: string }> => {
     try {
       setIsLoading(true);
@@ -143,7 +159,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         options: {
           data: {
             name: name.trim(),
-            phone: phone.trim()
+            phone: phone.trim(),
+            role: role
           }
         }
       });
@@ -172,7 +189,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             name: name.trim(),
             email: email.trim(),
             phone: phone.trim(),
-            balance: 2 // New users start with 2 hours
+            balance: 2, // New users start with 2 hours
+            role: role,
+            verification_status: role === 'freelancer' ? 'pending' : 'completed'
           }
         ]);
 
@@ -211,6 +230,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         console.error('Logout error:', error);
       }
       setUser(null);
+      setUserRoleState(null);
     } catch (error) {
       console.error('Logout exception:', error);
     } finally {
@@ -243,14 +263,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const setUserRole = (role: UserRole) => {
+    setUserRoleState(role);
+  };
+
   const value = {
     user,
+    userRole,
     isLoggedIn,
     isLoading,
     login,
     register,
     logout,
-    updateProfile
+    updateProfile,
+    setUserRole
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
