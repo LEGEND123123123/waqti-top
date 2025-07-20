@@ -176,9 +176,9 @@ const Header: React.FC<HeaderProps> = ({ activePage, setActivePage }) => {
             <>
               <li className={`mx-2`}>
                 <button
-                  onClick={() => handleNavClick('register')}
+                  onClick={() => handleNavClick('role-selection')}
                   className={`px-3 py-2 rounded-lg hover:bg-white hover:bg-opacity-20 transition-all ${
-                    activePage === 'register' ? 'bg-white bg-opacity-20' : ''
+                    activePage === 'role-selection' || activePage === 'enhanced-register' ? 'bg-white bg-opacity-20' : ''
                   }`}
                 >
                   {t('nav.register')}
@@ -186,9 +186,9 @@ const Header: React.FC<HeaderProps> = ({ activePage, setActivePage }) => {
               </li>
               <li className={`mx-2`}>
                 <button
-                  onClick={() => handleNavClick('login')}
+                  onClick={() => handleNavClick('role-selection')}
                   className={`px-3 py-2 rounded-lg hover:bg-white hover:bg-opacity-20 transition-all ${
-                    activePage === 'login' ? 'bg-white bg-opacity-20' : ''
+                    activePage === 'login' || activePage === 'enhanced-login' ? 'bg-white bg-opacity-20' : ''
                   }`}
                 >
                   {t('nav.login')}
@@ -345,9 +345,9 @@ const Header: React.FC<HeaderProps> = ({ activePage, setActivePage }) => {
               <>
                 <li className="py-2">
                   <button
-                    onClick={() => handleNavClick('register')}
+                    onClick={() => handleNavClick('role-selection')}
                     className={`w-full text-left px-3 py-2 rounded-lg hover:bg-white hover:bg-opacity-20 transition-all ${
-                      activePage === 'register' ? 'bg-white bg-opacity-20' : ''
+                      activePage === 'role-selection' || activePage === 'enhanced-register' ? 'bg-white bg-opacity-20' : ''
                     }`}
                   >
                     {t('nav.register')}
@@ -355,9 +355,9 @@ const Header: React.FC<HeaderProps> = ({ activePage, setActivePage }) => {
                 </li>
                 <li className="py-2">
                   <button
-                    onClick={() => handleNavClick('login')}
+                    onClick={() => handleNavClick('role-selection')}
                     className={`w-full text-left px-3 py-2 rounded-lg hover:bg-white hover:bg-opacity-20 transition-all ${
-                      activePage === 'login' ? 'bg-white bg-opacity-20' : ''
+                      activePage === 'login' || activePage === 'enhanced-login' ? 'bg-white bg-opacity-20' : ''
                     }`}
                   >
                     {t('nav.login')}
