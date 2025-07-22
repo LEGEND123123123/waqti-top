@@ -16,9 +16,6 @@ import EnhancedLoginPage from './pages/EnhancedLoginPage';
 import EnhancedRegisterPage from './pages/EnhancedRegisterPage';
 import EmailVerificationPage from './pages/EmailVerificationPage';
 import FreelancerVerificationPage from './pages/FreelancerVerificationPage';
-import ProviderRegistrationPage from './pages/ProviderRegistrationPage';
-import PhoneVerificationPage from './pages/PhoneVerificationPage';
-import ExpertiseVerificationPage from './pages/ExpertiseVerificationPage';
 import AboutPage from './pages/AboutPage';
 import SupportPage from './pages/SupportPage';
 import FAQPage from './pages/FAQPage';
@@ -43,12 +40,15 @@ function AppContent() {
   const [selectedFreelancerId, setSelectedFreelancerId] = useState<string | null>(null);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [previousPage, setPreviousPage] = useState('services');
-  const [verificationPhone, setVerificationPhone] = useState('');
   const { isLoading, userRole } = useAuth();
 
   const handleRoleSelect = (role: 'freelancer' | 'client') => {
     setSelectedRole(role);
-    setActivePage('enhanced-register');
+    if (activePage === 'role-selection') {
+      setActivePage('enhanced-register');
+    } else {
+      setActivePage('enhanced-login');
+    }
   };
 
   const handleEmailVerificationComplete = () => {
@@ -83,14 +83,6 @@ function AppContent() {
     setActivePage('userProfile');
   };
 
-  const handlePhoneVerification = (phone: string) => {
-    setVerificationPhone(phone);
-    setActivePage('phone-verification');
-  };
-
-  const handleVerificationComplete = () => {
-    setActivePage('expertise-verification');
-  };
 
   const goBack = () => {
     setActivePage(previousPage);
@@ -164,18 +156,6 @@ function AppContent() {
         return <LoginPage setActivePage={setActivePage} />;
       case 'register':
         return <RegisterPage setActivePage={setActivePage} />;
-      case 'provider-register':
-        return <ProviderRegistrationPage setActivePage={setActivePage} onPhoneVerification={handlePhoneVerification} />;
-      case 'phone-verification':
-        return (
-          <PhoneVerificationPage
-            phone={verificationPhone}
-            onVerificationComplete={handleVerificationComplete}
-            setActivePage={setActivePage}
-          />
-        );
-      case 'expertise-verification':
-        return <ExpertiseVerificationPage setActivePage={setActivePage} />;
       case 'about':
         return <AboutPage />;
       case 'support':

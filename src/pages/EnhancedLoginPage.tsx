@@ -162,7 +162,7 @@ const EnhancedLoginPage: React.FC<EnhancedLoginPageProps> = ({ setActivePage, us
         <p className="text-center mt-6 text-sm">
           Don't have an account?{' '}
           <button
-            onClick={() => setActivePage('role-selection')}
+            onClick={() => setActivePage('enhanced-register')}
             className="text-[#2E86AB] font-medium hover:underline"
             disabled={isSubmitting || isLoading}
           >

@@ -105,8 +105,7 @@ const EnhancedRegisterPage: React.FC<EnhancedRegisterPageProps> = ({ setActivePa
         formData.name.trim(),
         formData.email.trim(),
         formData.password,
-        formData.phone.trim(),
-        userRole
+        formData.phone.trim()
       );
       
       if (result.success) {
@@ -314,13 +313,23 @@ const EnhancedRegisterPage: React.FC<EnhancedRegisterPageProps> = ({ setActivePa
         <p className="text-center mt-6 text-sm">
           Already have an account?{' '}
           <button
-            onClick={() => setActivePage('login')}
+            onClick={() => setActivePage('enhanced-login')}
             className="text-[#2E86AB] font-medium hover:underline"
             disabled={isSubmitting || isLoading}
           >
             Sign In
           </button>
         </p>
+        
+        <div className="mt-6 text-center">
+          <button
+            onClick={() => setActivePage('role-selection')}
+            className="text-gray-600 hover:text-gray-800 text-sm"
+            disabled={isSubmitting || isLoading}
+          >
+            ← Back to Role Selection
+          </button>
+        </div>
       </motion.div>
     </div>
   );

@@ -3,16 +3,19 @@ import { User } from '../types';
 import { supabase } from '../lib/supabase';
 import type { User as SupabaseUser } from '@supabase/supabase-js';
 import { UserRole } from '../types/verification';
+import { UserRole } from '../types/verification';
 
 interface AuthContextType {
   user: User | null;
   userRole: UserRole | null;
+  userRole: UserRole | null;
   isLoggedIn: boolean;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<{ success: boolean; error?: string; role?: UserRole }>;
-  register: (name: string, email: string, password: string, phone: string, role: 'freelancer' | 'client') => Promise<{ success: boolean; error?: string }>;
+  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  register: (name: string, email: string, password: string, phone: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
   updateProfile: (updates: Partial<User>) => Promise<{ success: boolean; error?: string }>;
+  setUserRole: (role: UserRole) => void;
   setUserRole: (role: UserRole) => void;
 }
 
@@ -24,6 +27,7 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [userRole, setUserRoleState] = useState<UserRole | null>(null);
   const [userRole, setUserRoleState] = useState<UserRole | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const isLoggedIn = user !== null;
@@ -85,23 +89,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setUser({
           id: data.id,
           name: data.name,
-          email: data.email || '',
+          email: data.email,
           phone: data.phone || '',
           balance: data.balance || 2,
+          joinedAt: new Date(data.created_at),
             avatar: data.avatar_url,
-            role: data.role || 'client',
-            verificationStatus: data.verification_status || 'pending'
-          avatar: data.avatar_url
-          
-          // Set user role based on database data
-          const role: UserRole = {
-            type: data.role || 'client',
-            permissions: data.role === 'freelancer' ? ['create_services', 'submit_proposals'] : ['create_projects', 'hire_freelancers'],
-            verificationRequired: data.role === 'freelancer',
-            verificationStatus: data.verification_status || 'pending'
-          };
-          setUserRoleState(role);
+          isVerified: data.is_verified || false,
+          role: data.role || 'client'
         });
+        
+        // Set user role based on database data
+        const role: UserRole = {
+          type: data.role || 'client',
+          permissions: data.role === 'freelancer' ? ['create_services', 'submit_proposals'] : ['create_projects', 'hire_freelancers'],
+          verificationRequired: data.role === 'freelancer',
+          verificationStatus: data.verification_status || 'pending'
+        };
+        setUserRoleState(role);
       }
     } catch (error) {
       console.error('Profile fetch error:', error);
@@ -146,8 +150,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     name: string,
     email: string,
     password: string,
-    phone: string,
-    role: 'freelancer' | 'client'
+    phone: string
   ): Promise<{ success: boolean; error?: string }> => {
     try {
       setIsLoading(true);
@@ -159,8 +162,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         options: {
           data: {
             name: name.trim(),
-            phone: phone.trim(),
-            role: role
+            phone: phone.trim()
           }
         }
       });
@@ -187,11 +189,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           {
             id: authData.user.id,
             name: name.trim(),
-            email: email.trim(),
             phone: phone.trim(),
-            balance: 2, // New users start with 2 hours
-            role: role,
-            verification_status: role === 'freelancer' ? 'pending' : 'completed'
+            balance: 2 // New users start with 2 hours
           }
         ]);
 
@@ -266,9 +265,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const setUserRole = (role: UserRole) => {
     setUserRoleState(role);
   };
+  const setUserRole = (role: UserRole) => {
+    setUserRoleState(role);
+  };
 
   const value = {
     user,
+    userRole,
     userRole,
     isLoggedIn,
     isLoading,
