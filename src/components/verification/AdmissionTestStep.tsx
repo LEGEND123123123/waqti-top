@@ -1,5 +1,5 @@
 import React from 'react';
-import { AdmissionTest, TestQuestion } from '../../types/verification';
+import { AdmissionTest } from '../../types/verification';
 
 interface AdmissionTestStepProps {
   data: AdmissionTest;

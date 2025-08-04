@@ -3,11 +3,9 @@ import { User } from '../types';
 import { supabase } from '../lib/supabase';
 import type { User as SupabaseUser } from '@supabase/supabase-js';
 import { UserRole } from '../types/verification';
-import { UserRole } from '../types/verification';
 
 interface AuthContextType {
   user: User | null;
-  userRole: UserRole | null;
   userRole: UserRole | null;
   isLoggedIn: boolean;
   isLoading: boolean;
@@ -15,7 +13,6 @@ interface AuthContextType {
   register: (name: string, email: string, password: string, phone: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
   updateProfile: (updates: Partial<User>) => Promise<{ success: boolean; error?: string }>;
-  setUserRole: (role: UserRole) => void;
   setUserRole: (role: UserRole) => void;
 }
 
@@ -27,7 +24,6 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [userRole, setUserRoleState] = useState<UserRole | null>(null);
   const [userRole, setUserRoleState] = useState<UserRole | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const isLoggedIn = user !== null;
@@ -265,14 +261,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const setUserRole = (role: UserRole) => {
     setUserRoleState(role);
   };
-  const setUserRole = (role: UserRole) => {
-    setUserRoleState(role);
-  };
 
   const value = {
     user,
-    userRole,
-    userRole,
+    userRole: userRoleState,
     isLoggedIn,
     isLoading,
     login,

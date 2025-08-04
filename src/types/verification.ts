@@ -33,13 +33,6 @@ export interface BusinessGallery {
   currentWork: number;
 }
 
-export interface AdmissionTest {
-  questions: TestQuestion[];
-  answers: Record<string, any>;
-  score?: number;
-  passed?: boolean;
-}
-
 export interface TestQuestion {
   id: string;
   question: string;
@@ -47,6 +40,13 @@ export interface TestQuestion {
   options: string[];
   correctAnswer: string | string[];
   required: boolean;
+}
+
+export interface AdmissionTest {
+  questions: TestQuestion[];
+  answers: Record<string, any>;
+  score?: number;
+  passed?: boolean;
 }
 
 export interface VerificationData {
