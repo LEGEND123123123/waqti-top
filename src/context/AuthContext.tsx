@@ -264,7 +264,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const value = {
     user,
-    userRole: userRoleState,
+    userRole,
     isLoggedIn,
     isLoading,
     login,
