@@ -64,3 +64,37 @@ export interface UserRole {
   verificationRequired: boolean;
   verificationStatus?: 'pending' | 'in_progress' | 'completed' | 'rejected';
 }
+
+// Escrow System Types
+export interface EscrowTransaction {
+  id: string;
+  clientId: string;
+  freelancerId: string;
+  serviceId: string;
+  amount: number;
+  status: 'held' | 'released' | 'disputed' | 'refunded';
+  terms: string;
+  clientSignature: string;
+  freelancerSignature: string;
+  createdAt: Date;
+  releaseAt: Date;
+  releasedAt?: Date;
+  disputeReason?: string;
+}
+
+export interface EscrowApproval {
+  transactionId: string;
+  userId: string;
+  approved: boolean;
+  approvedAt: Date;
+}
+
+export interface DisputeEvidence {
+  id: string;
+  transactionId: string;
+  submitterId: string;
+  type: 'document' | 'image' | 'video' | 'text';
+  content: string;
+  fileUrl?: string;
+  submittedAt: Date;
+}

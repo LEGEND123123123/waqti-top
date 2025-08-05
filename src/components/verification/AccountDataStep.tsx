@@ -13,14 +13,15 @@ const AccountDataStep: React.FC<AccountDataStepProps> = ({ data, onChange, error
     <div className="space-y-6">
       <div className="text-center mb-8">
         <div className="w-24 h-24 bg-[#8B7355] rounded-full flex items-center justify-center text-white text-4xl font-bold mx-auto mb-4">
-          a
+          {data.username ? data.username.charAt(0).toUpperCase() : 'A'}
         </div>
-        <h2 className="text-2xl font-bold text-gray-900">Ahmed Alhabash</h2>
+        <h2 className="text-2xl font-bold text-gray-900">Account Setup</h2>
+        <p className="text-gray-600 mt-2">Create your unique username and select account type</p>
       </div>
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          <span className="text-red-500">*</span> user name
+          <span className="text-red-500">*</span> Username
         </label>
         <div className="flex">
           <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
@@ -93,13 +94,13 @@ const AccountDataStep: React.FC<AccountDataStepProps> = ({ data, onChange, error
           id="terms"
           checked={data.termsAccepted}
           onChange={(e) => onChange({ ...data, termsAccepted: e.target.checked })}
-          className="mt-1"
+          className="mt-1 rounded border-gray-300 text-[#2E86AB] focus:ring-[#2E86AB]"
         />
         <label htmlFor="terms" className="text-sm text-gray-700">
           <span className="text-red-500">*</span> I have read and agree to{' '}
-          <button className="text-[#2E86AB] hover:underline">the Terms of Use</button>
+          <button type="button" className="text-[#2E86AB] hover:underline">the Terms of Use</button>
           {' '}and{' '}
-          <button className="text-[#2E86AB] hover:underline">Privacy Statement</button>
+          <button type="button" className="text-[#2E86AB] hover:underline">Privacy Statement</button>
         </label>
       </div>
       {errors.terms && <p className="text-red-500 text-sm">{errors.terms}</p>}

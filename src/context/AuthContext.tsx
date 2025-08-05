@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, ReactNode, useEffect } from
 import { User } from '../types';
 import { supabase } from '../lib/supabase';
 import type { User as SupabaseUser } from '@supabase/supabase-js';
-import { UserRole } from '../types/verification';
+import type { UserRole } from '../types/verification';
 
 interface AuthContextType {
   user: User | null;
@@ -24,7 +24,7 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [userRole, setUserRoleState] = useState<UserRole | null>(null);
+  const [userRole, setUserRole] = useState<UserRole | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const isLoggedIn = user !== null;
 
@@ -101,7 +101,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           verificationRequired: data.role === 'freelancer',
           verificationStatus: data.verification_status || 'pending'
         };
-        setUserRoleState(role);
+        setUserRole(role);
       }
     } catch (error) {
       console.error('Profile fetch error:', error);
@@ -225,7 +225,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         console.error('Logout error:', error);
       }
       setUser(null);
-      setUserRoleState(null);
+      setUserRole(null);
     } catch (error) {
       console.error('Logout exception:', error);
     } finally {
@@ -258,8 +258,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const setUserRole = (role: UserRole) => {
-    setUserRoleState(role);
+  const setUserRoleFunction = (role: UserRole) => {
+    setUserRole(role);
   };
 
   const value = {
@@ -271,7 +271,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     register,
     logout,
     updateProfile,
-    setUserRole
+    setUserRole: setUserRoleFunction
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

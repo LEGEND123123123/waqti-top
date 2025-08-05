@@ -259,9 +259,9 @@ const FreelancerVerificationPage: React.FC<FreelancerVerificationPageProps> = ({
   const getButtonText = () => {
     if (verificationData.currentStep === 3) {
       const isLastWork = verificationData.businessGallery.currentWork === verificationData.businessGallery.works.length - 1;
-      return isLastWork ? 'the next' : 'Next Work';
+      return isLastWork ? 'Next Step' : 'Next Work';
     }
-    return verificationData.currentStep === 4 ? 'Submit Test' : 'the next';
+    return verificationData.currentStep === 4 ? 'Submit Test' : 'Next Step';
   };
 
   const canGoBack = () => {

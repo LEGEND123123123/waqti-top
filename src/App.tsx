@@ -16,6 +16,7 @@ import EnhancedLoginPage from './pages/EnhancedLoginPage';
 import EnhancedRegisterPage from './pages/EnhancedRegisterPage';
 import EmailVerificationPage from './pages/EmailVerificationPage';
 import FreelancerVerificationPage from './pages/FreelancerVerificationPage';
+import AdminDashboard from './pages/AdminDashboard';
 import AboutPage from './pages/AboutPage';
 import SupportPage from './pages/SupportPage';
 import FAQPage from './pages/FAQPage';
@@ -178,6 +179,8 @@ function AppContent() {
         return <BookingManagementPage setActivePage={setActivePage} />;
       case 'userProfile':
         return <UserProfilePage setActivePage={setActivePage} userId={selectedUserId || undefined} />;
+      case 'admin':
+        return <AdminDashboard setActivePage={setActivePage} />;
       case 'serviceDetail':
         return selectedServiceId ? (
           <ServiceDetailPage 

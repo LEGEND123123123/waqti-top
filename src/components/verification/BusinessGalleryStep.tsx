@@ -1,6 +1,5 @@
 import React, { useCallback } from 'react';
 import { Upload, ChevronLeft, ChevronRight } from 'lucide-react';
-import { useDropzone } from 'react-dropzone';
 import { BusinessGallery, PortfolioWork } from '../../types/verification';
 
 interface BusinessGalleryStepProps {
@@ -25,8 +24,8 @@ const BusinessGalleryStep: React.FC<BusinessGalleryStepProps> = ({
   const currentWork = data.works[data.currentWork];
   const workNumber = data.currentWork + 1;
 
-  const onDrop = useCallback((acceptedFiles: File[]) => {
-    const file = acceptedFiles[0];
+  const handleFileUpload = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
     if (file) {
       const newWorks = [...data.works];
       newWorks[data.currentWork] = {
@@ -37,13 +36,6 @@ const BusinessGalleryStep: React.FC<BusinessGalleryStepProps> = ({
       onChange({ ...data, works: newWorks });
     }
   }, [data, currentWork, onChange]);
-
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop,
-    accept: { 'image/*': ['.jpeg', '.jpg', '.png'] },
-    maxFiles: 1,
-    maxSize: 2 * 1024 * 1024 // 2MB
-  });
 
   const updateCurrentWork = (updates: Partial<PortfolioWork>) => {
     const newWorks = [...data.works];
@@ -106,31 +98,34 @@ const BusinessGalleryStep: React.FC<BusinessGalleryStepProps> = ({
             <label className="block text-sm font-medium text-gray-700 mb-2 text-right">
               <span className="text-red-500">*</span> Thumbnail
             </label>
-            <div
-              {...getRootProps()}
-              className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
-                isDragActive ? 'border-[#2E86AB] bg-blue-50' : 'border-gray-300 hover:border-gray-400'
-              }`}
-            >
-              <input {...getInputProps()} />
-              {currentWork.thumbnailUrl ? (
-                <div className="space-y-4">
-                  <img
-                    src={currentWork.thumbnailUrl}
-                    alt="Work thumbnail"
-                    className="max-h-32 mx-auto rounded"
-                  />
-                  <p className="text-sm text-gray-600">Click to change image</p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  <Upload className="mx-auto text-gray-400" size={48} />
-                  <div>
-                    <p className="text-lg font-medium text-gray-700">Drag image here</p>
-                    <p className="text-sm text-gray-500">Or click to select manually</p>
+            <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-gray-400">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleFileUpload}
+                className="hidden"
+                id={`file-upload-${workNumber}`}
+              />
+              <label htmlFor={`file-upload-${workNumber}`} className="cursor-pointer">
+                {currentWork.thumbnailUrl ? (
+                  <div className="space-y-4">
+                    <img
+                      src={currentWork.thumbnailUrl}
+                      alt="Work thumbnail"
+                      className="max-h-32 mx-auto rounded"
+                    />
+                    <p className="text-sm text-gray-600">Click to change image</p>
                   </div>
-                </div>
-              )}
+                ) : (
+                  <div className="space-y-4">
+                    <Upload className="mx-auto text-gray-400" size={48} />
+                    <div>
+                      <p className="text-lg font-medium text-gray-700">Drag image here</p>
+                      <p className="text-sm text-gray-500">Or click to select manually</p>
+                    </div>
+                  </div>
+                )}
+              </label>
             </div>
             <p className="text-xs text-gray-500 mt-1 text-right">
               Add an attractive image that expresses the work
@@ -157,4 +152,4 @@ const BusinessGalleryStep: React.FC<BusinessGalleryStepProps> = ({
   );
 };
 
-export default BusinessGalleryStep;
+export default ProfileStep;
