@@ -152,4 +152,4 @@ const BusinessGalleryStep: React.FC<BusinessGalleryStepProps> = ({
   );
 };
 
-export default ProfileStep;
+export default BusinessGalleryStep;
