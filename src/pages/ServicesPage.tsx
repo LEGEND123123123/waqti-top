@@ -4,6 +4,9 @@ import { Service } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 import ServiceCard from '../components/ServiceCard';
 import Button from '../components/Button';
+import { ServicesService } from '../services/servicesService';
+import LoadingSpinner from '../components/LoadingSpinner';
+import ErrorState from '../components/ErrorState';
 
 interface ServicesPageProps {
   onServiceClick: (serviceId: string) => void;
@@ -11,70 +14,9 @@ interface ServicesPageProps {
 
 const ServicesPage: React.FC<ServicesPageProps> = ({ onServiceClick }) => {
   const { t, isRTL } = useLanguage();
-  
-  // Mock data
-  const services = [
-    {
-      id: '1',
-      title: 'Professional Web Development',
-      description: 'I offer expert web development services using modern technologies like React, Vue, and Node.js.',
-      category: 'Programming',
-      provider: {
-        id: '101',
-        name: 'Ahmed Hassan',
-        email: 'ahmed@example.com',
-        phone: '+971501234567',
-        balance: 8,
-        joinedAt: new Date('2023-01-15'),
-        avatar: 'https://randomuser.me/api/portraits/men/32.jpg'
-      },
-      hourlyRate: 2,
-      location: 'Dubai',
-      rating: 4.8,
-      reviews: 24,
-      image: 'https://images.pexels.com/photos/3861958/pexels-photo-3861958.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'
-    },
-    {
-      id: '2',
-      title: 'Arabic-English Translation',
-      description: 'Native Arabic speaker offering professional translation services.',
-      category: 'Translation',
-      provider: {
-        id: '102',
-        name: 'Layla Mohamed',
-        email: 'layla@example.com',
-        phone: '+971502345678',
-        balance: 12,
-        joinedAt: new Date('2023-02-20'),
-        avatar: 'https://randomuser.me/api/portraits/women/44.jpg'
-      },
-      hourlyRate: 1,
-      location: 'Abu Dhabi',
-      rating: 4.9,
-      reviews: 36,
-      image: 'https://images.pexels.com/photos/7092613/pexels-photo-7092613.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'
-    },
-    {
-      id: '3',
-      title: 'Graphic Design & Branding',
-      description: 'Creative graphic designer specializing in branding, logo design, and marketing materials.',
-      category: 'Design',
-      provider: {
-        id: '103',
-        name: 'Sara Ali',
-        email: 'sara@example.com',
-        phone: '+971503456789',
-        balance: 9,
-        joinedAt: new Date('2023-03-10'),
-        avatar: 'https://randomuser.me/api/portraits/women/63.jpg'
-      },
-      hourlyRate: 2,
-      location: 'Sharjah',
-      rating: 4.7,
-      reviews: 19,
-      image: 'https://images.pexels.com/photos/6444/pencil-typography-black-design.jpg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'
-    }
-  ];
+  const [services, setServices] = useState<Service[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const categories = [
     'Design',
@@ -87,7 +29,6 @@ const ServicesPage: React.FC<ServicesPageProps> = ({ onServiceClick }) => {
     'Photography'
   ];
 
-  const [filteredServices, setFilteredServices] = useState<Service[]>(services);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [selectedLocation, setSelectedLocation] = useState<string>('');
@@ -95,45 +36,57 @@ const ServicesPage: React.FC<ServicesPageProps> = ({ onServiceClick }) => {
   const [maxHours, setMaxHours] = useState<number>(10);
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
 
+  // Load services on component mount
+  useEffect(() => {
+    loadServices();
+  }, []);
+
+  // Search when filters change
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      searchServices();
+    }, 500); // Debounce search
+
+    return () => clearTimeout(timeoutId);
+  }, [searchTerm, selectedCategory, selectedLocation, minRating, maxHours]);
+
+  const loadServices = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await ServicesService.getAllServices();
+      setServices(data);
+    } catch (err) {
+      setError('Failed to load services');
+      console.error('Load services error:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const searchServices = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const filters = {
+        category: selectedCategory,
+        location: selectedLocation,
+        minRating: minRating,
+        maxHours: maxHours,
+        sortBy: 'rating'
+      };
+      const data = await ServicesService.searchServices(searchTerm, filters);
+      setServices(data);
+    } catch (err) {
+      setError('Search failed');
+      console.error('Search services error:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Extract unique locations from services
   const locations = Array.from(new Set(services.map((service) => service.location)));
-
-  // Apply filters
-  useEffect(() => {
-    let result = [...services];
-    
-    // Apply search term filter
-    if (searchTerm) {
-      result = result.filter((service) => 
-        service.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        service.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        service.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        service.provider.name.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-    
-    // Apply category filter
-    if (selectedCategory) {
-      result = result.filter((service) => service.category === selectedCategory);
-    }
-    
-    // Apply location filter
-    if (selectedLocation) {
-      result = result.filter((service) => service.location === selectedLocation);
-    }
-    
-    // Apply rating filter
-    if (minRating > 0) {
-      result = result.filter((service) => service.rating >= minRating);
-    }
-    
-    // Apply max hours filter
-    if (maxHours < 10) {
-      result = result.filter((service) => service.hourlyRate <= maxHours);
-    }
-    
-    setFilteredServices(result);
-  }, [searchTerm, selectedCategory, selectedLocation, minRating, maxHours]);
 
   const clearFilters = () => {
     setSearchTerm('');
@@ -144,7 +97,29 @@ const ServicesPage: React.FC<ServicesPageProps> = ({ onServiceClick }) => {
     setIsMobileFilterOpen(false);
   };
 
-  const hasActiveFilters = selectedCategory || selectedLocation || minRating > 0 || maxHours < 10;
+  const hasActiveFilters = searchTerm || selectedCategory || selectedLocation || minRating > 0 || maxHours < 10;
+
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-8 md:py-12">
+        <div className="flex justify-center items-center min-h-[400px]">
+          <LoadingSpinner size="lg" text="Loading services..." />
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto px-4 py-8 md:py-12">
+        <ErrorState
+          title="Failed to load services"
+          message={error}
+          onRetry={loadServices}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 py-8 md:py-12">
@@ -281,7 +256,7 @@ const ServicesPage: React.FC<ServicesPageProps> = ({ onServiceClick }) => {
         
         {/* Services Grid */}
         <div className="flex-1">
-          {filteredServices.length === 0 ? (
+          {services.length === 0 ? (
             <div className="text-center py-12 md:py-16 bg-white rounded-xl shadow-sm">
               <div className="max-w-md mx-auto px-4">
                 <h3 className="text-lg md:text-xl font-semibold mb-2">{t('services.noResults')}</h3>
@@ -294,10 +269,10 @@ const ServicesPage: React.FC<ServicesPageProps> = ({ onServiceClick }) => {
           ) : (
             <>
               <div className="mb-4 text-sm text-gray-600">
-                {filteredServices.length} {filteredServices.length === 1 ? 'service' : 'services'} found
+                {services.length} {services.length === 1 ? 'service' : 'services'} found
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
-                {filteredServices.map((service) => (
+                {services.map((service) => (
                   <ServiceCard
                     key={service.id}
                     service={service}

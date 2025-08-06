@@ -1,11 +1,12 @@
 import React from 'react';
 import { UserPlus, Search, Clock, Users, TrendingUp } from 'lucide-react';
-import { Service } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 import ServiceCard from '../components/ServiceCard';
 import Button from '../components/Button';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
+import { ServicesService } from '../services/servicesService';
+import { Service } from '../types';
 
 interface HomePageProps {
   setActivePage: (page: string) => void;
@@ -14,79 +15,33 @@ interface HomePageProps {
 
 const HomePage: React.FC<HomePageProps> = ({ setActivePage, onServiceClick }) => {
   const { t, isRTL } = useLanguage();
+  const [popularServices, setPopularServices] = React.useState<Service[]>([]);
+  const [loading, setLoading] = React.useState(true);
   const [heroRef, heroInView] = useInView({ triggerOnce: true });
   const [statsRef, statsInView] = useInView({ triggerOnce: true });
   const [servicesRef, servicesInView] = useInView({ triggerOnce: true });
   const [howItWorksRef, howItWorksInView] = useInView({ triggerOnce: true });
   
-  // Mock services data
-  const services = [
-    {
-      id: '1',
-      title: 'Professional Web Development',
-      description: 'I offer expert web development services using modern technologies like React, Vue, and Node.js.',
-      category: 'Programming',
-      provider: {
-        id: '101',
-        name: 'Ahmed Hassan',
-        email: 'ahmed@example.com',
-        phone: '+971501234567',
-        balance: 8,
-        joinedAt: new Date('2023-01-15'),
-        avatar: 'https://randomuser.me/api/portraits/men/32.jpg'
-      },
-      hourlyRate: 2,
-      location: 'Dubai',
-      rating: 4.8,
-      reviews: 24,
-      image: 'https://images.pexels.com/photos/3861958/pexels-photo-3861958.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'
-    },
-    {
-      id: '2',
-      title: 'Arabic-English Translation',
-      description: 'Native Arabic speaker offering professional translation services.',
-      category: 'Translation',
-      provider: {
-        id: '102',
-        name: 'Layla Mohamed',
-        email: 'layla@example.com',
-        phone: '+971502345678',
-        balance: 12,
-        joinedAt: new Date('2023-02-20'),
-        avatar: 'https://randomuser.me/api/portraits/women/44.jpg'
-      },
-      hourlyRate: 1,
-      location: 'Abu Dhabi',
-      rating: 4.9,
-      reviews: 36,
-      image: 'https://images.pexels.com/photos/7092613/pexels-photo-7092613.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'
-    },
-    {
-      id: '3',
-      title: 'Graphic Design & Branding',
-      description: 'Creative graphic designer specializing in branding, logo design, and marketing materials.',
-      category: 'Design',
-      provider: {
-        id: '103',
-        name: 'Sara Ali',
-        email: 'sara@example.com',
-        phone: '+971503456789',
-        balance: 9,
-        joinedAt: new Date('2023-03-10'),
-        avatar: 'https://randomuser.me/api/portraits/women/63.jpg'
-      },
-      hourlyRate: 2,
-      location: 'Sharjah',
-      rating: 4.7,
-      reviews: 19,
-      image: 'https://images.pexels.com/photos/6444/pencil-typography-black-design.jpg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'
-    }
-  ];
+  // Load popular services on component mount
+  React.useEffect(() => {
+    const loadPopularServices = async () => {
+      try {
+        const allServices = await ServicesService.getAllServices();
+        // Get top 6 services by rating
+        const topServices = allServices
+          .sort((a, b) => b.rating - a.rating)
+          .slice(0, 6);
+        setPopularServices(topServices);
+      } catch (error) {
+        console.error('Error loading popular services:', error);
+        setPopularServices([]);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  // Get popular services (top 6 by rating)
-  const popularServices = [...services]
-    .sort((a, b) => b.rating - a.rating)
-    .slice(0, 6);
+    loadPopularServices();
+  }, []);
 
   const fadeInUp = {
     hidden: { opacity: 0, y: 20 },
@@ -192,20 +147,31 @@ const HomePage: React.FC<HomePageProps> = ({ setActivePage, onServiceClick }) =>
           transition={{ duration: 0.6, delay: 0.2 }}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6"
         >
-          {popularServices.map((service, index) => (
-            <motion.div
-              key={service.id}
-              variants={fadeInUp}
-              initial="hidden"
-              animate={servicesInView ? "visible" : "hidden"}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
-            >
-              <ServiceCard 
-                service={service} 
-                onClick={() => onServiceClick(service.id)}
-              />
-            </motion.div>
-          ))}
+          {loading ? (
+            // Loading skeleton
+            Array.from({ length: 6 }).map((_, index) => (
+              <div key={index} className="bg-white rounded-xl shadow-md p-6 animate-pulse">
+                <div className="h-48 bg-gray-200 rounded-lg mb-4"></div>
+                <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+              </div>
+            ))
+          ) : (
+            popularServices.map((service, index) => (
+              <motion.div
+                key={service.id}
+                variants={fadeInUp}
+                initial="hidden"
+                animate={servicesInView ? "visible" : "hidden"}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+              >
+                <ServiceCard 
+                  service={service} 
+                  onClick={() => onServiceClick(service.id)}
+                />
+              </motion.div>
+            ))
+          )}
         </motion.div>
         
         <motion.div 
