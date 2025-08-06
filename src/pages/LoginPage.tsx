@@ -153,11 +153,15 @@ const LoginPage: React.FC<LoginPageProps> = ({ setActivePage }) => {
           </button>
         </p>
 
-        {/* Setup instructions */}
-        <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-          <p className="text-sm text-blue-800 mb-2 font-medium">First Time Setup?</p>
-          <p className="text-xs text-blue-600">Make sure to configure your Supabase credentials in the .env file</p>
-          <p className="text-xs text-blue-600">See setup-supabase.md for detailed instructions</p>
+        {/* Demo credentials for testing */}
+        <div className="mt-6 p-4 bg-green-50 rounded-lg border border-green-200">
+          <p className="text-sm text-green-800 mb-2 font-medium">✅ Demo Ready!</p>
+          <p className="text-xs text-green-600 mb-2">Try these demo credentials or create your own account:</p>
+          <div className="bg-white p-2 rounded border">
+            <p className="text-xs font-mono text-green-700">Email: demo@waqti.com</p>
+            <p className="text-xs font-mono text-green-700">Password: demo123456</p>
+          </div>
+          <p className="text-xs text-green-600 mt-2">Or register a new account - it works instantly!</p>
         </div>
       </div>
     </div>
