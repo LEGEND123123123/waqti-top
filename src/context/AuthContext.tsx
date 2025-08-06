@@ -74,7 +74,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         .from('users')
         .select('*')
         .eq('id', userId)
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error('Error fetching user profile:', error);
@@ -102,6 +102,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           verificationStatus: data.verification_status || 'pending'
         };
         setUserRole(role);
+      } else {
+        // User profile doesn't exist yet, this is normal for new users
+        console.log('User profile not found, user may need to complete registration');
       }
     } catch (error) {
       console.error('Profile fetch error:', error);
@@ -121,7 +124,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         console.error('Login error:', error);
         return { 
           success: false, 
-          error: error.message || 'Login failed. Please check your credentials.' 
+          error: error.message === 'Invalid login credentials' 
+            ? 'Invalid email or password. Please check your credentials and try again.'
+            : error.message || 'Login failed. Please try again.'
         };
       }
 
@@ -181,23 +186,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // Create user profile in our users table
       const { error: profileError } = await supabase
         .from('users')
-        .insert([
-          {
-            id: authData.user.id,
-            name: name.trim(),
-            phone: phone.trim(),
-            balance: 2 // New users start with 2 hours
-          }
-        ]);
+        .insert({
+          id: authData.user.id,
+          name: name.trim(),
+          email: email.trim(),
+          phone: phone.trim(),
+          balance: 2 // New users start with 2 hours
+        });
 
       if (profileError) {
         console.error('Profile creation error:', profileError);
-        // If profile creation fails, we should clean up the auth user
-        await supabase.auth.signOut();
-        return { 
-          success: false, 
-          error: 'Failed to create user profile. Please try again.' 
-        };
+        // Don't fail registration if profile creation fails due to RLS
+        // The user can complete their profile later
+        console.log('Profile creation failed, user can complete profile later');
       }
 
       // If email confirmation is disabled, the user will be automatically signed in
