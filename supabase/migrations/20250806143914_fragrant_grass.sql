@@ -26,8 +26,11 @@
     - Balance validation
 */
 
+-- Drop existing users table if it exists to recreate with new schema
+DROP TABLE IF EXISTS public.users CASCADE;
+
 -- Users table (extends auth.users)
-CREATE TABLE IF NOT EXISTS public.users (
+CREATE TABLE public.users (
   id UUID REFERENCES auth.users(id) PRIMARY KEY,
   name TEXT NOT NULL,
   email TEXT UNIQUE NOT NULL,
@@ -47,7 +50,8 @@ CREATE TABLE IF NOT EXISTS public.users (
 );
 
 -- Services table
-CREATE TABLE IF NOT EXISTS public.services (
+DROP TABLE IF EXISTS public.services CASCADE;
+CREATE TABLE public.services (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   title TEXT NOT NULL,
   description TEXT NOT NULL,
@@ -67,7 +71,8 @@ CREATE TABLE IF NOT EXISTS public.services (
 );
 
 -- Bookings table
-CREATE TABLE IF NOT EXISTS public.bookings (
+DROP TABLE IF EXISTS public.bookings CASCADE;
+CREATE TABLE public.bookings (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   service_id UUID REFERENCES public.services(id) ON DELETE CASCADE,
   client_id UUID REFERENCES public.users(id) ON DELETE CASCADE,
@@ -83,7 +88,8 @@ CREATE TABLE IF NOT EXISTS public.bookings (
 );
 
 -- Transactions table (for escrow and time credits)
-CREATE TABLE IF NOT EXISTS public.transactions (
+DROP TABLE IF EXISTS public.transactions CASCADE;
+CREATE TABLE public.transactions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   client_id UUID REFERENCES public.users(id) ON DELETE CASCADE,
   freelancer_id UUID REFERENCES public.users(id) ON DELETE CASCADE,
@@ -102,7 +108,8 @@ CREATE TABLE IF NOT EXISTS public.transactions (
 );
 
 -- Messages table
-CREATE TABLE IF NOT EXISTS public.messages (
+DROP TABLE IF EXISTS public.messages CASCADE;
+CREATE TABLE public.messages (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   conversation_id UUID NOT NULL,
   sender_id UUID REFERENCES public.users(id) ON DELETE CASCADE,
@@ -120,7 +127,8 @@ CREATE TABLE IF NOT EXISTS public.messages (
 );
 
 -- Reviews table
-CREATE TABLE IF NOT EXISTS public.reviews (
+DROP TABLE IF EXISTS public.reviews CASCADE;
+CREATE TABLE public.reviews (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   service_id UUID REFERENCES public.services(id) ON DELETE CASCADE,
   booking_id UUID REFERENCES public.bookings(id) ON DELETE CASCADE,
@@ -140,7 +148,8 @@ CREATE TABLE IF NOT EXISTS public.reviews (
 );
 
 -- Freelancer verification table
-CREATE TABLE IF NOT EXISTS public.freelancer_verifications (
+DROP TABLE IF EXISTS public.freelancer_verifications CASCADE;
+CREATE TABLE public.freelancer_verifications (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES public.users(id) ON DELETE CASCADE,
   username TEXT UNIQUE NOT NULL,
@@ -163,7 +172,8 @@ CREATE TABLE IF NOT EXISTS public.freelancer_verifications (
 );
 
 -- Notifications table
-CREATE TABLE IF NOT EXISTS public.notifications (
+DROP TABLE IF EXISTS public.notifications CASCADE;
+CREATE TABLE public.notifications (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES public.users(id) ON DELETE CASCADE,
   type TEXT NOT NULL CHECK (type IN ('booking', 'message', 'payment', 'review', 'system', 'verification')),
@@ -177,7 +187,8 @@ CREATE TABLE IF NOT EXISTS public.notifications (
 );
 
 -- Disputes table
-CREATE TABLE IF NOT EXISTS public.disputes (
+DROP TABLE IF EXISTS public.disputes CASCADE;
+CREATE TABLE public.disputes (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   transaction_id UUID REFERENCES public.transactions(id) ON DELETE CASCADE,
   initiator_id UUID REFERENCES public.users(id) ON DELETE CASCADE,
@@ -195,7 +206,8 @@ CREATE TABLE IF NOT EXISTS public.disputes (
 );
 
 -- Portfolio items table
-CREATE TABLE IF NOT EXISTS public.portfolio_items (
+DROP TABLE IF EXISTS public.portfolio_items CASCADE;
+CREATE TABLE public.portfolio_items (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES public.users(id) ON DELETE CASCADE,
   title TEXT NOT NULL,
@@ -215,7 +227,8 @@ CREATE TABLE IF NOT EXISTS public.portfolio_items (
 );
 
 -- Conversations table
-CREATE TABLE IF NOT EXISTS public.conversations (
+DROP TABLE IF EXISTS public.conversations CASCADE;
+CREATE TABLE public.conversations (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   type TEXT NOT NULL DEFAULT 'direct' CHECK (type IN ('direct', 'group', 'support')),
   title TEXT,

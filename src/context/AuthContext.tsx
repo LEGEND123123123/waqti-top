@@ -68,6 +68,60 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
   }, []);
 
+  const createUserProfile = async (userId: string) => {
+    try {
+      // Get the auth user details
+      const { data: authUser, error: authError } = await supabase.auth.getUser();
+      if (authError || !authUser.user) {
+        console.error('Error getting auth user:', authError);
+        return;
+      }
+
+      // Create user profile with data from auth
+      const { data, error } = await supabase
+        .from('users')
+        .insert({
+          id: userId,
+          name: authUser.user.user_metadata?.name || authUser.user.email?.split('@')[0] || 'User',
+          email: authUser.user.email || '',
+          phone: authUser.user.user_metadata?.phone || '',
+          balance: 2
+        })
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error creating user profile:', error);
+        return;
+      }
+
+      if (data) {
+        setUser({
+          id: data.id,
+          name: data.name,
+          email: data.email,
+          phone: data.phone || '',
+          balance: data.balance || 2,
+          joinedAt: new Date(data.created_at),
+          avatar: data.avatar_url,
+          isVerified: data.is_verified || false,
+          role: data.role || 'client'
+        });
+        
+        // Set user role
+        const role: UserRole = {
+          type: 'client',
+          permissions: ['create_projects', 'hire_freelancers'],
+          verificationRequired: false,
+          verificationStatus: 'pending'
+        };
+        setUserRole(role);
+      }
+    } catch (error) {
+      console.error('Profile creation error:', error);
+    }
+  };
+
   const fetchUserProfile = async (userId: string) => {
     try {
       const { data, error } = await supabase
@@ -89,7 +143,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           phone: data.phone || '',
           balance: data.balance || 2,
           joinedAt: new Date(data.created_at),
-            avatar: data.avatar_url,
+          avatar: data.avatar_url,
           isVerified: data.is_verified || false,
           role: data.role || 'client'
         });
@@ -103,8 +157,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         };
         setUserRole(role);
       } else {
-        // User profile doesn't exist yet, this is normal for new users
-        console.log('User profile not found, user may need to complete registration');
+        // User profile doesn't exist yet, try to create it from auth user
+        console.log('User profile not found, attempting to create from auth user');
+        await createUserProfile(userId);
       }
     } catch (error) {
       console.error('Profile fetch error:', error);
@@ -183,23 +238,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         };
       }
 
-      // Create user profile in our users table
-      const { error: profileError } = await supabase
-        .from('users')
-        .insert({
-          id: authData.user.id,
-          name: name.trim(),
-          email: email.trim(),
-          phone: phone.trim(),
-          balance: 2 // New users start with 2 hours
-        });
-
-      if (profileError) {
-        console.error('Profile creation error:', profileError);
-        // Don't fail registration if profile creation fails due to RLS
-        // The user can complete their profile later
-        console.log('Profile creation failed, user can complete profile later');
-      }
+      // Profile will be created automatically in fetchUserProfile if it doesn't exist
 
       // If email confirmation is disabled, the user will be automatically signed in
       if (authData.session) {
